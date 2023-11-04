@@ -40,10 +40,22 @@ def congratulations(message):
 
 @bot.message_handler(content_types=["location"])
 def send(message):
-    # Отправка по id
     global senderID
     if senderID != '':
-        bot.send_message(senderID, f'Пользователь {message.from_user.id} находится здесь:')
+        # Найти имя пользователя по id
+        conn = sqlite3.connect('Data.dat')
+        cur = conn.cursor()
+
+        cur.execute('SELECT * FROM users')
+        users = cur.fetchall()
+
+        for user in users:
+            if str(user[1]) == str(message.from_user.id):
+                bot.send_message(senderID, f'{user[0]} находится здесь')
+
+        cur.close()
+        conn.close()
+
         bot.send_location(senderID, message.location.latitude, message.location.longitude)
         # Если я отправлю при запросе от меня же, то мне придет моя геолокация
         # Поэтому необходимо занулить эту строку:
@@ -61,23 +73,23 @@ def notification(message):
     senderID = message.from_user.id
     wantedID = ''
 
-    # Найти id пользователя по имени
+    # Найти id пользователя по имени и имя пользователя по id
     conn = sqlite3.connect('Data.dat')
     cur = conn.cursor()
 
     cur.execute('SELECT * FROM users')
     users = cur.fetchall()
+
     for user in users:
-        bot.send_message(message.chat.id, f'{user[0]}, {user[1]}')
         if user[0] == message.text.upper():
             wantedID = user[1]
-            break
+        if str(user[1]) == str(senderID):
+            bot.send_message(wantedID, f'{user[0]} хочет знать ваше местоположение')
 
     cur.close()
     conn.close()
 
     # Рассылка
     bot.send_message(senderID, 'Уведомление отправлено!')
-    bot.send_message(wantedID, f'Пользователь {senderID} хочет знать ваше местоположение')
 
 bot.polling(non_stop=True)
