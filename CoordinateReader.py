@@ -6,17 +6,22 @@ bot = telebot.TeleBot('6447415648:AAHAZrEnHgt7Vtlq8aaptxLuGUd4ZlQCLig')
 senderID = ''
 
 @bot.message_handler(commands=["start"])
+def start(message):
+    # Создание кнопки
+    keyboard = types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True)
+    keyboard.add(types.KeyboardButton(text="Отправить местоположение", request_location=True))
+    # Регистрация
+    registration(message)
+
+@bot.message_handler(commands=["registration"])
 def registration(message):
-    # Внести в базу данных основные сведения о человеке, который только включил бота
+    # Внести в базу данных основные сведения о человеке
     bot.send_message(message.chat.id, 'Введите вашу фамилию')
     '''
         Создание строки с двумя столбцами:
             * message.text (фамилия)
             * message.from_user.id (id пользователя)
     '''
-    # Создание кнопки
-    keyboard = types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True)
-    keyboard.add(types.KeyboardButton(text="Отправить местоположение", request_location=True))
 
 @bot.message_handler(content_types=["location"])
 def send(message):
