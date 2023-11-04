@@ -84,13 +84,17 @@ def notification(message):
     for user in users:
         if user[0] == message.text.upper():
             wantedID = user[1]
-        if str(user[1]) == str(senderID):
+
+    for user in users:
+        if str(user[1]) == str(senderID) and wantedID != '':
             bot.send_message(wantedID, f'{user[0]} хочет знать ваше местоположение')
+            bot.send_message(senderID, 'Уведомление отправлено!')
+
+    if wantedID == '':
+        bot.send_message(senderID, 'Нет человека с таким именем!')
 
     cur.close()
     conn.close()
 
-    # Рассылка
-    bot.send_message(senderID, 'Уведомление отправлено!')
 
 bot.polling(non_stop=True)
