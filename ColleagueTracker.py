@@ -56,7 +56,8 @@ def send(message):
         cur.close()
         conn.close()
 
-        bot.send_location(senderID, message.location.latitude, message.location.longitude)
+        # Отправить живую карту
+        bot.send_location(senderID, message.location.latitude, message.location.longitude, live_period=900)
         # Если я отправлю при запросе от меня же, то мне придет моя геолокация
         # Поэтому необходимо занулить эту строку:
         senderID = ''
