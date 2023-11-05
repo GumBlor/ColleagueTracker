@@ -14,7 +14,7 @@ def start(message):
     # Создание базы данных
     conn = sqlite3.connect('Data.dat')
     cur = conn.cursor()
-    cur.execute('CREATE TABLE IF NOT EXISTS users (name varchar(50), userID varchar(9))')
+    cur.execute('CREATE TABLE IF NOT EXISTS users (name varchar(50), userID varchar(9) UNIQUE)')
     conn.commit()
     cur.close()
     conn.close()
@@ -31,7 +31,7 @@ def congratulations(message):
     # Добавление в базу данных имени и id пользователя
     conn = sqlite3.connect('Data.dat')
     cur = conn.cursor()
-    cur.execute("INSERT INTO users (name, userID) VALUES ('%s', '%s')" % (message.text.upper(), message.from_user.id))
+    cur.execute("INSERT OR REPLACE INTO users (name, userID) VALUES ('%s', '%s')" % (message.text.upper(), message.from_user.id))
     conn.commit()
     cur.close()
     conn.close()
@@ -52,12 +52,13 @@ def send(message):
         for user in users:
             if str(user[1]) == str(message.from_user.id):
                 bot.send_message(senderID, f'{user[0]} находится здесь')
+                # Отправить живую карту
+                bot.send_location(senderID, message.location.latitude, message.location.longitude, live_period=900)
+                bot.send_message(message.chat.id, f'Ваше местоположение успешно отправлено!')
 
         cur.close()
         conn.close()
 
-        # Отправить живую карту
-        bot.send_location(senderID, message.location.latitude, message.location.longitude, live_period=900)
         # Если я отправлю при запросе от меня же, то мне придет моя геолокация
         # Поэтому необходимо занулить эту строку:
         senderID = ''
