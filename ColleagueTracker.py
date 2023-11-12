@@ -53,7 +53,7 @@ def send(message):
             if str(user[1]) == str(message.from_user.id):
                 bot.send_message(senderID, f'{user[0]} находится здесь')
                 # Отправить живую карту
-                bot.send_location(senderID, message.location.latitude, message.location.longitude, live_period=900)
+                bot.send_location(senderID, message.location.latitude, message.location.longitude)
                 bot.send_message(message.chat.id, f'Ваше местоположение успешно отправлено!')
 
         cur.close()
